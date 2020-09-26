@@ -6,6 +6,10 @@ spec:
   containers:
     - image: artpropp/kuard-aarch64:latest
       name: kuard
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "128Mi"
       livenessProbe:
         httpGet:
           path: /healthy
