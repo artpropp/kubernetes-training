@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpaca-prod
+  labels:
+    ver: "1"
+    app: alpaca
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alpaca
+  template:
+    metadata:
+      labels:
+        app: alpaca
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpaca-test
+  labels:
+    ver: "2"
+    app: alpaca
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpaca
+  template:
+    metadata:
+      labels:
+        app: alpaca
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bandicoot-prod
+  labels:
+    ver: "2"
+    app: bandicoot
+    env: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bandicoot
+  template:
+    metadata:
+      labels:
+        app: bandicoot
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bandicoot-test
+  labels:
+    ver: "2"
+    app: bandicoot
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bandicoot
+  template:
+    metadata:
+      labels:
+        app: bandicoot
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
