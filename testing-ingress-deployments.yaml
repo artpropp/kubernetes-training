@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpaca
+  labels:
+    app: alpaca
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: alpaca
+  template:
+    metadata:
+      labels:
+        app: alpaca
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /ready
+            periodSeconds: 2
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            successThreshold: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpaca-prod
+spec:
+  ports:
+    - targetPort: 8080
+      port: 8080
+  selector:
+    app: alpaca
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bandicoot
+  labels:
+    app: bandicoot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bandicoot
+  template:
+    metadata:
+      labels:
+        app: bandicoot
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bandicoot-prod
+spec:
+  ports:
+    - targetPort: 8080
+      port: 8080
+  selector:
+    app: bandicoot
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: be-default
+  labels:
+    app: be-default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: be-default
+  template:
+    metadata:
+      labels:
+        app: be-default
+    spec:
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: be-default
+spec:
+  ports:
+    - targetPort: 8080
+      port: 8080
+  selector:
+    app: be-default
