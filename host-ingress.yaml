@@ -13,6 +13,11 @@ spec:
     - host: bandicoot.example.com
       http:
         paths:
-          - backend:
+          - path: /
+            backend:
               serviceName: bandicoot-prod
+              servicePort: 8080
+          - path: /a
+            backend:
+              serviceName: alpaca-prod
               servicePort: 8080
