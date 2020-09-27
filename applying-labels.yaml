@@ -10,17 +10,29 @@ spec:
   replicas: 2
   selector:
     matchLabels:
+      ver: "1"
       app: alpaca
+      env: prod
   template:
     metadata:
       labels:
+        ver: "1"
         app: alpaca
+        env: prod
     spec:
       containers:
         - name: kuard
           image: artpropp/kuard-aarch64
           ports:
             - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /ready
+            periodSeconds: 2
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            successThreshold: 1
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,11 +46,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      ver: "2"
       app: alpaca
+      env: test
   template:
     metadata:
       labels:
+        ver: "2"
         app: alpaca
+        env: test
     spec:
       containers:
         - name: kuard
@@ -58,11 +74,15 @@ spec:
   replicas: 2
   selector:
     matchLabels:
+      ver: "2"
       app: bandicoot
+      env: prod
   template:
     metadata:
       labels:
+        ver: "2"
         app: bandicoot
+        env: prod
     spec:
       containers:
         - name: kuard
@@ -82,11 +102,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      ver: "2"
       app: bandicoot
+      env: test
   template:
     metadata:
       labels:
+        ver: "2"
         app: bandicoot
+        env: test
     spec:
       containers:
         - name: kuard
