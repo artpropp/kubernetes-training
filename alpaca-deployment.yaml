@@ -16,11 +16,15 @@ spec:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  revisionHistoryLimit: 2
+  minReadySeconds: 60
   template:
     metadata:
       labels:
         app: alpaca
         ver: v2
+      annotations:
+        kubernetes.io/change-cause: Update to kuard-aarch64:latest
     spec:
       volumes:
         - name: kuard-data
@@ -29,7 +33,7 @@ spec:
             server: 192.168.2.201
       containers:
         - name: kuard
-          image: artpropp/kuard-aarch64
+          image: artpropp/kuard-aarch64:latest
           volumeMounts:
             - mountPath: /data
               name: kuard-data
