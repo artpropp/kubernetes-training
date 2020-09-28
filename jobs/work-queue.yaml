@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queue
+  labels:
+    app: work-queue
+    component: queue
+    chapter: jobs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: work-queue
+      component: queue
+      chapter: jobs
+  template:
+    metadata:
+      labels:
+        app: work-queue
+        component: queue
+        chapter: jobs
+    spec:
+      containers:
+        - name: queue
+          image: artpropp/kuard-aarch64:green
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: queue
+  labels:
+    app: work-queue
+    component: queue
+    chapter: jobs
+spec:
+  selector:
+    app: work-queue
+    component: queue
+    chapter: jobs
+  ports:
+    - protocol: TCP
+      port: 8090
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: work-queue
+spec:
+  rules:
+    - host: bandicoot.example.com
+      http:
+        paths:
+          - backend:
+              serviceName: queue
+              servicePort: 8090
