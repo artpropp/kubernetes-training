@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alpaca
+  labels:
+    app: alpaca
+    ver: v2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: alpaca
+      ver: v2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: alpaca
+        ver: v2
+    spec:
+      volumes:
+        - name: kuard-data
+          nfs:
+            path: /exports
+            server: 192.168.2.201
+      containers:
+        - name: kuard
+          image: artpropp/kuard-aarch64
+          volumeMounts:
+            - mountPath: /data
+              name: kuard-data
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /ready
+            periodSeconds: 2
+            initialDelaySeconds: 0
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /healthy
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 128Mi
+            limits:
+              cpu: 2000m
+              memory: 256Mi
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: alpaca-ingress
+spec:
+  rules:
+    - host: alpaca.example.com
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: alpaca-prod
+              servicePort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alpaca-prod
+spec:
+  selector:
+    app: alpaca
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: alpaca
+  labels:
+    app: alpaca
+spec:
+  maxReplicas: 8
+  minReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: alpaca
+  targetCPUUtilizationPercentage: 80
